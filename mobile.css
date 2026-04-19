@@ -1,0 +1,233 @@
+/* mobile.css - Extremely strict overrides exclusively for Mobile UX */
+
+body {
+    font-size: 14px !important;
+    overflow-x: hidden !important;
+}
+
+.app-container {
+    flex-direction: column-reverse !important;
+}
+
+/* Completely redesign the Sidebar into a modern Bottom App Bar */
+.sidebar {
+    width: 100% !important;
+    border-right: none !important;
+    border-top: 1px solid var(--accent) !important;
+    padding: 10px 0 !important;
+    display: flex !important;
+    flex-direction: row !important;
+    justify-content: space-evenly !important;
+    align-items: center !important;
+    z-index: 10000 !important;
+    background: rgba(6, 9, 19, 0.98) !important;
+    backdrop-filter: blur(20px) !important;
+    position: fixed !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    height: 75px !important;
+    margin-bottom: 0px !important;
+}
+
+.logo, .user-profile {
+    display: none !important;
+}
+
+.nav-links {
+    flex-direction: row !important;
+    justify-content: space-around !important;
+    width: 100% !important;
+    gap: 0 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+}
+
+.nav-links li {
+    padding: 10px !important;
+    flex-direction: column !important;
+    font-size: 0px !important; /* Hide text, keep icons */
+    gap: 0 !important;
+    justify-content: center !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    transform: none !important;
+}
+
+.nav-links li i {
+    font-size: 2rem !important;
+    margin: 0 !important;
+    color: var(--text-secondary) !important;
+    transition: var(--transition) !important;
+}
+
+.nav-links li.active i {
+    color: var(--accent) !important;
+    filter: drop-shadow(0 0 15px var(--accent-glow)) !important;
+    transform: scale(1.15) !important;
+}
+
+.nav-links li span {
+    display: none !important;
+}
+
+/* Base Main Content - Pad bottom heavily for the fake App Bar */
+.main-content {
+    padding: 15px 15px 95px 15px !important; 
+    width: 100vw !important;
+    overflow-x: hidden !important;
+}
+
+/* Force Grids to Stack Vertically securely */
+.grid-layout, .dual-col {
+    grid-template-columns: 1fr !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 20px !important;
+    width: 100% !important;
+}
+
+/* Glass Cards full width adjustments */
+.glass-card {
+    padding: 20px !important;
+    margin-bottom: 0 !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+}
+
+/* Top Header overlapping fix */
+.top-header {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 10px !important;
+    margin-bottom: 20px !important;
+    padding-top: 10px !important;
+    position: relative !important;
+}
+
+.greeting h1 {
+    font-size: 2rem !important;
+    max-width: 65% !important;
+    line-height: 1.1 !important;
+}
+
+.header-actions {
+    position: absolute !important;
+    right: 5px !important;
+    top: 10px !important;
+    display: flex !important;
+    gap: 12px !important;
+    margin: 0 !important;
+}
+
+.icon-btn {
+    width: 45px !important;
+    height: 45px !important;
+    font-size: 1.3rem !important;
+}
+
+/* Internal Card Headers */
+.card-header {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 12px !important;
+    padding-bottom: 15px !important;
+}
+
+.card-header h3 {
+    font-size: 1.3rem !important;
+    white-space: normal !important;
+}
+
+.card-header .btn {
+    width: 100% !important;
+    justify-content: center !important;
+    padding: 14px !important;
+}
+
+/* Table overrides to allow swiping */
+.table-container {
+    width: 100% !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    padding-bottom: 10px !important;
+}
+
+.habit-table {
+    min-width: 700px !important; /* Force the content to scroll rather than squish together */
+}
+
+/* Input Forms */
+.modern-form .form-group {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 8px !important;
+}
+
+.form-group.dual-inputs {
+    flex-direction: column !important;
+    gap: 15px !important;
+}
+
+.form-group.dual-inputs > div {
+    width: 100% !important;
+}
+
+.input-with-icon input, .input-with-icon select {
+    padding: 16px 16px 16px 45px !important;
+    font-size: 16px !important; /* Prevents auto-zoom on iOS */
+}
+
+/* Stats Cards */
+.stat-card .stat-info h2 {
+    font-size: 2.2rem !important;
+}
+
+.stat-card .icon-box {
+    width: 55px !important;
+    height: 55px !important;
+    font-size: 1.8rem !important;
+}
+
+/* Transaction List and Summaries */
+.balance-summary {
+    flex-direction: row !important;
+    flex-wrap: wrap !important;
+    gap: 15px !important;
+    padding: 15px !important;
+    align-items: flex-start !important;
+}
+
+.balance-summary div {
+    width: 45% !important;
+}
+
+.transaction-list li {
+    flex-direction: row !important;
+    flex-wrap: wrap !important;
+    gap: 10px !important;
+}
+
+/* Fix Toast Notifications so they don't hide under the bottom tab */
+.toast-container {
+    right: 5% !important;
+    left: 5% !important;
+    bottom: 90px !important;
+    transform: none !important;
+    width: 90% !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+}
+
+.toast {
+    width: 100% !important;
+    box-sizing: border-box !important;
+}
+
+/* Overlays and Modals */
+.modal-card {
+    width: 95% !important;
+    padding: 20px !important;
+    max-height: 85vh !important;
+    overflow-y: auto !important;
+}
