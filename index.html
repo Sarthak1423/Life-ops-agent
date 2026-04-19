@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- PWA Manifest & Meta -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#8a2be2">
+    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/8654/8654345.png">
+    
+    <title>Life Ops Agent Premium</title>
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+    <!-- Icons -->
+    <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Styles -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- Toast Notifications (A11y: aria-live region) -->
+    <div id="toast-container" class="toast-container" aria-live="polite" aria-atomic="true"></div>
+
+    <!-- Modals -->
+    <div id="modal-overlay" class="modal-overlay hidden" aria-hidden="true">
+        <!-- Search Modal -->
+        <div id="search-modal" class="modal-card glass-card hidden" role="dialog" aria-labelledby="search-modal-title">
+            <div class="modal-header">
+                <h3 id="search-modal-title"><i class='bx bx-search'></i> Global Search</h3>
+                <button class="close-modal-btn" aria-label="Close search modal" onclick="closeModals()"><i class='bx bx-x'></i></button>
+            </div>
+            <div class="form-group mt-2">
+                <div class="input-with-icon">
+                    <i class='bx bx-search-alt-2' aria-hidden="true"></i>
+                    <input type="text" id="global-search-input" aria-label="Search habits or finances query" placeholder="Search habits or finances...">
+                </div>
+            </div>
+            <ul id="search-results" class="search-results-list" aria-live="polite">
+                <li style="text-align:center;color:var(--text-secondary);padding:1rem;">Type to begin searching</li>
+            </ul>
+        </div>
+
+        <!-- Add Habit Modal -->
+        <div id="habit-modal" class="modal-card glass-card hidden" role="dialog" aria-labelledby="habit-modal-title">
+            <div class="modal-header">
+                <h3 id="habit-modal-title"><i class='bx bx-star'></i> Choose a Habit</h3>
+                <button class="close-modal-btn" aria-label="Close habit modal" onclick="closeModals()"><i class='bx bx-x'></i></button>
+            </div>
+            <div class="habit-options mt-2">
+                <button class="btn habit-pill" aria-label="Add hit the gym habit" onclick="submitNewHabit('Hit the Gym')"><i class='bx bx-dumbbell'></i> Hit the Gym</button>
+                <button class="btn habit-pill" aria-label="Add read 20 pages habit" onclick="submitNewHabit('Read 20 Pages')"><i class='bx bx-book-open'></i> Read 20 Pages</button>
+                <button class="btn habit-pill" aria-label="Add meditate habit" onclick="submitNewHabit('Meditate (15m)')"><i class='bx bx-spa'></i> Meditate (15m)</button>
+                <button class="btn habit-pill" aria-label="Add drink water habit" onclick="submitNewHabit('Drink 2L Water')"><i class='bx bx-water'></i> Drink 2L Water</button>
+                <button class="btn habit-pill" aria-label="Add code 2 hours habit" onclick="submitNewHabit('Code/Study 2 Hrs')"><i class='bx bx-code-alt'></i> Code 2 Hrs</button>
+            </div>
+            <div class="form-group mt-2">
+                <label for="custom-habit-input">Or type a custom habit:</label>
+                <div style="display:flex; gap:10px;">
+                    <input type="text" id="custom-habit-input" placeholder="e.g. Learn French...">
+                    <button class="btn primary-btn" aria-label="Submit custom habit" onclick="submitCustomHabit()"><i class='bx bx-plus'></i></button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Login Overlay -->
+    <div id="login-overlay" class="login-overlay">
+        <article class="login-card glass-card relative-glow-box">
+            <div class="logo justify-center mb-2">
+                <i class='bx bx-planet' aria-hidden="true"></i>
+                <span style="background: var(--grad-accent); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;">Ops Agent</span>
+            </div>
+            <h2 style="text-align: center; margin-bottom: 2rem; font-weight: 400; color: var(--text-secondary)">Please authenticate</h2>
+            
+            <form id="login-form" class="modern-form">
+                <div class="form-group">
+                    <label for="login-username">Commander Name</label>
+                    <div class="input-with-icon">
+                        <i class='bx bx-user' aria-hidden="true"></i>
+                        <input type="text" id="login-username" placeholder="Enter your name..." required>
+                    </div>
+                </div>
+                <button type="submit" class="btn primary-btn w-full mt-2" aria-label="Initialize session">Initialize Local Session</button>
+            </form>
+        </article>
+    </div>
+
+    <!-- Datalists for AutoComplete -->
+    <datalist id="indian-cities">
+        <option value="Delhi">
+        <option value="Dehradun">
+        <option value="Mumbai">
+        <option value="Bangalore">
+        <option value="Chennai">
+        <option value="Kolkata">
+        <option value="Hyderabad">
+        <option value="Jaipur">
+        <option value="Shimla">
+        <option value="Manali">
+        <option value="Goa">
+        <option value="Pune">
+        <option value="Ahmedabad">
+    </datalist>
+
+
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <nav class="sidebar" aria-label="Main Navigation">
+            <div class="logo">
+                <i class='bx bx-planet' aria-hidden="true"></i>
+                <span style="background: var(--grad-accent); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; font-family:'Space Grotesk', sans-serif;">Ops Agent</span>
+            </div>
+            <ul class="nav-links" role="menu">
+                <li class="active" data-tab="dashboard" role="menuitem" tabindex="0" onkeypress="handleTabEnter(event, 'dashboard')">
+                    <i class='bx bx-grid-alt' aria-hidden="true"></i>
+                    <span>Dashboard</span>
+                </li>
+                <li data-tab="finance" role="menuitem" tabindex="0" onkeypress="handleTabEnter(event, 'finance')">
+                    <i class='bx bx-wallet' aria-hidden="true"></i>
+                    <span>Expense Tracker</span>
+                </li>
+                <li data-tab="habits" role="menuitem" tabindex="0" onkeypress="handleTabEnter(event, 'habits')">
+                    <i class='bx bx-check-shield' aria-hidden="true"></i>
+                    <span>Habits & Health</span>
+                </li>
+                <li data-tab="travel" role="menuitem" tabindex="0" onkeypress="handleTabEnter(event, 'travel')">
+                    <i class='bx bx-paper-plane' aria-hidden="true"></i>
+                    <span>Travel</span>
+                </li>
+            </ul>
+            <div class="user-profile">
+                <div class="avatar">
+                    <img id="user-avatar" src="https://ui-avatars.com/api/?name=User&background=6c5ce7&color=fff" alt="User Avatar Profile Picture">
+                </div>
+                <div class="profile-info">
+                    <h4 id="user-name-display">Loading...</h4>
+                    <button class="logout-btn" aria-label="Logout user session" onclick="logoutUser()">Logout <i class='bx bx-log-out'></i></button>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main-content" role="main">
+            <!-- Header -->
+            <header class="top-header">
+                <div class="greeting">
+                    <h1 id="page-title">Dashboard</h1>
+                    <p id="date-display">Today is a great day</p>
+                </div>
+                <div class="header-actions">
+                    <button class="icon-btn" aria-label="View notifications" onclick="showToast('No new system alerts!')" title="Notifications"><i class='bx bx-bell'></i><span class="notif-dot"></span></button>
+                    <button class="icon-btn" aria-label="Open global search" onclick="openSearchModal()" title="Search"><i class='bx bx-search'></i></button>
+                </div>
+            </header>
+
+            <!-- Views Container -->
+            <div class="views-wrapper">
+                
+                <!-- Dashboard View -->
+                <section id="dashboard" class="view active-view" aria-labelledby="page-title">
+                    <div class="grid-layout">
+                        <!-- Quick Stats -->
+                        <div class="glass-card stat-card primary-gradient custom-shadow">
+                            <div class="icon-box" aria-hidden="true"><i class='bx bx-wallet-alt'></i></div>
+                            <div class="stat-info">
+                                <h3>Current Balance</h3>
+                                <h2 id="dash-balance" style="font-family:'Space Grotesk', sans-serif;">$0.00</h2>
+                            </div>
+                        </div>
+                        <div class="glass-card stat-card accent-gradient custom-shadow">
+                            <div class="icon-box" aria-hidden="true"><i class='bx bx-category'></i></div>
+                            <div class="stat-info">
+                                <h3>Habit Score</h3>
+                                <h2 id="dash-habit-score" style="font-family:'Space Grotesk', sans-serif;">0%</h2>
+                            </div>
+                        </div>
+
+                        <!-- Graphical Overview -->
+                        <div class="glass-card full-width glow-border" style="display:flex; justify-content:space-around; align-items:center;">
+                            <div style="flex:1;">
+                                <h3 style="font-family:'Space Grotesk'; font-size:1.4rem; margin-bottom:1rem;"><i class='bx bx-chart text-primary'></i> Habit Progress (Week)</h3>
+                                <div class="chart-container" style="position: relative; height:200px; width:100%">
+                                    <canvas id="habitChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Mini Checklist -->
+                        <div class="glass-card full-width glow-border">
+                            <div class="card-header flex-between align-center">
+                                <h3><i class='bx bx-target-lock text-accent' aria-hidden="true"></i> Today's Priorities</h3>
+                                <button class="btn small-btn neon-btn" aria-label="Synchronize dashboard habits" onclick="syncDashboard()"><i class='bx bx-sync'></i> Sync with Habits</button>
+                            </div>
+                            <ul class="mini-checklist" id="dash-priorities">
+                                <!-- Dynamic daily habits populated here -->
+                            </ul>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Finance View -->
+                <section id="finance" class="view" aria-label="Expense Tracker Module">
+                    <div class="grid-layout dual-col">
+                        <div class="glass-card glow-border">
+                            <div class="card-header">
+                                <h3><i class='bx bx-plus-circle text-primary' aria-hidden="true"></i> Add Transaction</h3>
+                            </div>
+                            <form id="finance-form" class="modern-form">
+                                <div class="form-group">
+                                    <label for="trans-type">Type</label>
+                                    <div class="input-with-icon">
+                                        <i class='bx bx-transfer'></i>
+                                        <select id="trans-type" aria-label="Transaction Type Selection" required>
+                                            <option value="expense">Expense (- Money Out)</option>
+                                            <option value="income">Income (+ Money In)</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="trans-amount">Amount</label>
+                                    <input type="number" id="trans-amount" aria-label="Transaction Amount" placeholder="0.00" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="trans-desc">Description</label>
+                                    <input type="text" id="trans-desc" aria-label="Transaction Description" placeholder="e.g., Groceries or Salary" required>
+                                </div>
+                                <button type="submit" class="btn primary-btn w-full mt-2" aria-label="Log Data Record">Log Record</button>
+                            </form>
+
+                            <!-- Mini Chart Container for Finance -->
+                            <div style="margin-top:2rem;">
+                                <h3 style="font-family:'Space Grotesk'; font-size:1.1rem; color:var(--text-secondary); margin-bottom:1rem; text-align:center;">Cash Flow Ratio</h3>
+                                <div class="chart-container" style="position: relative; height:180px; width:100%; display:flex; justify-content:center;">
+                                    <canvas id="financeChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="glass-card glass-panel flex-col">
+                            <div class="card-header flex-between align-center">
+                                <h3><i class='bx bx-list-ul text-accent' aria-hidden="true"></i> Recent Transactions</h3>
+                                <button class="btn small-btn neon-btn" aria-label="Export Data to CSV" onclick="exportFinanceCSV()"><i class='bx bx-export'></i> CSV</button>
+                            </div>
+                            <div class="balance-summary">
+                                <div>
+                                    <span class="label">Total Spent</span>
+                                    <span class="value text-danger" id="total-expense">-$0.00</span>
+                                </div>
+                                <div>
+                                    <span class="label">Total Received</span>
+                                    <span class="value text-success" id="total-income">+$0.00</span>
+                                </div>
+                            </div>
+                            <ul class="transaction-list" id="transaction-list" aria-label="Transaction List">
+                                <!-- Dynamic items here -->
+                            </ul>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Habits View -->
+                <section id="habits" class="view" aria-label="Habits tracking module">
+                    <div class="glass-card full-width glow-border" style="margin-top: 0;">
+                        <div class="card-header flex-between">
+                            <div>
+                                <h3><i class='bx bx-calendar-star text-primary' aria-hidden="true"></i> Weekly Habit Tracker</h3>
+                                <p class="subtitle">Track consistency to boost your daily score.</p>
+                            </div>
+                            <button class="btn neon-btn" aria-label="Open add new habit modal" onclick="openHabitModal()"><i class='bx bx-plus'></i> Add New Habit</button>
+                        </div>
+                        <div class="table-container">
+                            <table class="habit-table" aria-label="Weekly Habit Matrix">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Habit Task</th>
+                                        <th scope="col">Mon</th>
+                                        <th scope="col">Tue</th>
+                                        <th scope="col">Wed</th>
+                                        <th scope="col">Thu</th>
+                                        <th scope="col">Fri</th>
+                                        <th scope="col">Sat</th>
+                                        <th scope="col">Sun</th>
+                                        <th scope="col">Progress</th>
+                                        <th scope="col">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="habit-tbody">
+                                    <!-- Dynamic habits -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Travel View -->
+                <section id="travel" class="view" aria-label="Travel AI Assistant Module">
+                    <div class="grid-layout dual-col">
+                        <div class="glass-card glow-border">
+                            <div class="card-header">
+                                <h3><i class='bx bx-map-alt text-primary' aria-hidden="true"></i> Plan Trip</h3>
+                                <p class="subtitle">Realistic AI Budgeting & Connections</p>
+                            </div>
+                            <form id="travel-form" class="modern-form">
+                                <div class="form-group dual-inputs">
+                                    <div>
+                                        <label for="trip-from">From</label>
+                                        <div class="input-with-icon">
+                                            <i class='bx bx-map-pin' aria-hidden="true"></i>
+                                            <input type="text" id="trip-from" list="indian-cities" aria-label="Departure City" placeholder="e.g. Delhi" required autocomplete="off">
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label for="trip-to">To</label>
+                                        <div class="input-with-icon">
+                                            <i class='bx bx-map' aria-hidden="true"></i>
+                                            <input type="text" id="trip-to" list="indian-cities" aria-label="Destination City" placeholder="e.g. Shimla" required autocomplete="off">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group dual-inputs">
+                                    <div>
+                                        <label for="trip-date">Travel Date</label>
+                                        <input type="date" id="trip-date" aria-label="Travel date selector" required>
+                                    </div>
+                                    <div>
+                                        <label for="trip-budget">Budget (&#8377;)</label>
+                                        <input type="number" id="trip-budget" aria-label="Travel budget integer" placeholder="15000" required>
+                                    </div>
+                                </div>
+                                <button type="submit" class="btn primary-btn w-full mt-2" aria-label="Generate travel strategies">Generate Strategies</button>
+                            </form>
+                        </div>
+
+                        <div class="glass-card results-card glass-panel">
+                            <div class="card-header">
+                                <h3><i class='bx bx-link-external text-accent' aria-hidden="true"></i> Bookable Strategies</h3>
+                            </div>
+                            <div id="travel-results" class="results-container" aria-live="polite">
+                                <div class="empty-state">
+                                    <div class="floating-icon"><i class='bx bx-planet'></i></div>
+                                    <p>Enter your details to generate realistic travel options within budget.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- PWA Installation Script -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js')
+                    .then(reg => console.log('Ops Agent PWA Loaded', reg))
+                    .catch(e => console.log('PWA Loading Error', e));
+            });
+        }
+    </script>
+    <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,21 @@
+{
+  "name": "Life Ops Agent",
+  "short_name": "Ops Agent",
+  "description": "Your ultimate personal command center for habits, travel, and expenses.",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#060913",
+  "theme_color": "#8a2be2",
+  "icons": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/8654/8654345.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/8654/8654345.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
